@@ -1,0 +1,56 @@
+CREATE OR REPLACE TABLE `anestasya10102026.rakamin_kimiafarma.kf_analisa` AS
+SELECT
+    ft.transaction_id,
+    ft.date,
+    ft.customer_name,
+    ft.discount_percentage,
+    ft.rating AS rating_transaksi,
+
+    ft.branch_id,
+    kc.branch_name,
+    kc.kota,
+    kc.provinsi,
+    kc.rating AS rating_cabang,
+
+    ft.product_id,
+    p.product_name,
+    ft.price AS actual_price,
+
+    CASE
+        WHEN ft.price <= 50000 THEN 0.10
+        WHEN ft.price <= 100000 THEN 0.15
+        WHEN ft.price <= 300000 THEN 0.20
+        WHEN ft.price <= 500000 THEN 0.25
+        ELSE 0.30
+    END AS persentase_gross_laba,
+
+    ft.price * (1 - COALESCE(ft.discount_percentage, 0) / 100.0)
+        AS nett_sales,
+
+    (
+        ft.price * (1 - COALESCE(ft.discount_percentage, 0) / 100.0)
+    ) *
+    CASE
+        WHEN ft.price <= 50000 THEN 0.10
+        WHEN ft.price <= 100000 THEN 0.15
+        WHEN ft.price <= 300000 THEN 0.20
+        WHEN ft.price <= 500000 THEN 0.25
+        ELSE 0.30
+    END AS nett_profit
+
+FROM `anestasya10102026.rakamin_kimiafarma.kf_final_transaction` AS ft
+
+LEFT JOIN `anestasya10102026.rakamin_kimiafarma.kf_kantor_cabang` AS kc
+    ON ft.branch_id = kc.branch_id
+
+LEFT JOIN `anestasya10102026.rakamin_kimiafarma.kf_product` AS p
+    ON ft.product_id = p.product_id
+
+LEFT JOIN `anestasya10102026.rakamin_kimiafarma.kf_inventory` AS i
+    ON ft.branch_id = i.branch_id
+    AND ft.product_id = i.product_id;
+
+--cek isi data
+SELECT * FROM `rakamin_kimiafarma.kf_analisa`
+WHERE customer_name="Eric Scott"
+LIMIT 20;

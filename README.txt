@@ -1,0 +1,1 @@
+Hai, aku Anestasya sharing tentang hasil final task mengikuti Project Based Internship dari Rakamin Academy. Syntax adalah query untuk extract dataset menggunakan Google BigQuery.
